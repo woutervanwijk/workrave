@@ -275,6 +275,11 @@ Core::heartbeat()
         spdlog::info("Heartbeat #{} gap={}s", heartbeat_count, now - last_heartbeat_wall_time);
         spdlog::default_logger()->flush();
       }
+    if (heartbeat_count % 300 == 0)
+      {
+        spdlog::info("Heartbeat #{} alive at {}", heartbeat_count, now);
+        spdlog::default_logger()->flush();
+      }
     last_heartbeat_wall_time = now;
   }
 
@@ -469,6 +474,11 @@ Core::set_powersave(bool down)
     {
       remove_operation_mode_override("powersave");
       powersave = false;
+      spdlog::info("wake: mode={} monitor_active={} reading_active={}",
+                   static_cast<int>(core_modes->get_active_operation_mode()),
+                   monitor->is_active() ? 1 : 0,
+                   0);
+      spdlog::default_logger()->flush();
     }
 }
 
