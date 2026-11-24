@@ -21,6 +21,8 @@
 
 #include "ui/macos/MacOSSleepMonitor.hh"
 
+#include <spdlog/spdlog.h>
+
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
 
@@ -46,6 +48,8 @@ MacOSSleepMonitor::MacOSSleepMonitor(std::function<void(bool)> callback)
                 object:[NSWorkspace sharedWorkspace]
                  queue:[NSOperationQueue mainQueue]
             usingBlock:^(NSNotification *) {
+              spdlog::info("SleepMonitor: system sleep detected, suspending timers");
+              spdlog::default_logger()->flush();
               cb(true);
             }];
 
@@ -54,6 +58,8 @@ MacOSSleepMonitor::MacOSSleepMonitor(std::function<void(bool)> callback)
                 object:[NSWorkspace sharedWorkspace]
                  queue:[NSOperationQueue mainQueue]
             usingBlock:^(NSNotification *) {
+              spdlog::info("SleepMonitor: system wake detected, resuming timers");
+              spdlog::default_logger()->flush();
               cb(false);
             }];
 }
