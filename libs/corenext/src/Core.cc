@@ -265,6 +265,19 @@ Core::heartbeat()
       throw;
     }
 
+  // Diagnostics: report heartbeat progress so that a stalled event loop or
+  // a missed wake-up is visible in the log.
+  {
+    const int64_t now = TimeSource::get_real_time_sec();
+    heartbeat_count++;
+    if (last_heartbeat_wall_time != 0 && now - last_heartbeat_wall_time > 5)
+      {
+        spdlog::info("Heartbeat #{} gap={}s", heartbeat_count, now - last_heartbeat_wall_time);
+        spdlog::default_logger()->flush();
+      }
+    last_heartbeat_wall_time = now;
+  }
+
   // BreaksControl logs its own context before rethrowing.
   breaks_control->heartbeat();
 
@@ -432,6 +445,12 @@ Core::set_powersave(bool down)
 {
   TRACE_ENTRY_PAR(down);
   TRACE_VAR(powersave, core_modes->get_active_operation_mode());
+
+  spdlog::info("Core::set_powersave({}) powersave={} mode={}",
+               down,
+               powersave,
+               static_cast<int>(core_modes->get_active_operation_mode()));
+  spdlog::default_logger()->flush();
 
   if (down)
     {

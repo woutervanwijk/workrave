@@ -110,6 +110,10 @@ private:
 #endif
 
 private:
+  //! Diagnostics: number of heartbeats and wall time of the last one (seconds).
+  int64_t heartbeat_count{0};
+  int64_t last_heartbeat_wall_time{0};
+
   //! List of breaks.
   BreaksControl::Ptr breaks_control;
 
